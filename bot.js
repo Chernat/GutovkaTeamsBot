@@ -13,6 +13,49 @@ let userResponses = {}; // Объект для хранения ответов
 // Список команд (пример)
 const teams = ['Team A', 'Team B', 'Team C'];
 
+
+bot.on('inline_query', (query) => {
+    console.log('Получен запрос:', query);
+
+    const queryId = query.id;
+    const queryText = query.query;
+
+    // Проверяем запрос на ключевое слово (например, "team")
+    if (queryText.startsWith('team')) {
+        const participants = queryText.split(' ').slice(1);
+        const teams = splitIntoTeams(participants, 2); // Разделяем на 2 команды для примера
+
+        // Формируем ответ для инлайн-запроса
+        const results = [
+            {
+                type: 'article',
+                id: '1',
+                title: 'Разделить на команды',
+                input_message_content: {
+                    message_text: formatTeams(teams),
+                },
+            },
+        ];
+
+        bot.answerInlineQuery(queryId, results);
+    } else {
+        // Пустой ответ, если не передали команды
+        const results = [
+            {
+                type: 'article',
+                id: '0',
+                title: 'Введите команду в формате: team имя1 имя2 имя3...',
+                input_message_content: {
+                    message_text:
+                        'Введите команду в формате: team имя1 имя2 имя3...',
+                },
+            },
+        ];
+
+        bot.answerInlineQuery(queryId, results);
+    }
+});
+
 // Отправка опроса
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
